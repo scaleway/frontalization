@@ -618,10 +618,43 @@ Again, here we see input images on top, followed by generated images in the midd
 
 Here we have trained the GAN model with parameters as in the code above for the first three epochs, then set the `GAN_factor` to zero and continued to train only the generator, optimizing the L1 and L2 losses, for two more epochs. 
 
+# Why use GANs for supervised ML problems?
 
+Generative Adversarial Networks were initially meant for [*unsupervised machine learning*](https://machinelearningmastery.com/supervised-and-unsupervised-machine-learning-algorithms/): a typical training set consists of the so-called "real" examples of some data (which are not labeled, unlike in *supervised learning*), and the goal is to train the network to generate more examples of the same sort of data. However, GANs are increasingly being used for tasks where training inputs have corresponding outputs (i.e., supervised machine learning). Examples include [face frontalization](https://arxiv.org/abs/1704.04086), [super resolution](https://medium.com/@jonathan_hui/gan-super-resolution-gan-srgan-b471da7270ec), etc. What is the benefit of introducing a GAN architecture into such problems?
 
+Let us compare the results of training the `Generator` network above in a supervised way using only the L2 pixelwise loss, with the combined `Generator`/`Discriminator` architecture. In the latter case, the `Discriminator` is trained to accept the *real* images, reject the *synethic* ones, and the `Generator` learns to fool the `Discriminator` in addition to optimizing the L2 loss.
 
+In the first case, the generated images start to resemble human faces early on during training, but the fine features remain blurry for not only for the test set, but also for the training samples for a relatively long time:
 
+Images generated after 20 000 mini batch evaluations:
+
+![](figs/L2_0epoch.jpeg)
+
+Images generated after 40 000 mini batch evaluations:
+
+![](figs/L2_1epoch.jpeg)
+
+Mathematically, this can be attributed to the small contribution of fine details to pixelwise loss. Since longer training times are required to achieve desired accuracy for the training set, this makes such models prone to over-fitting. Introducing GAN into the picture changes things considerably:
+
+Images generated after 20 000 mini batch evaluations:
+
+![](figs/GAN_0epoch.jpeg)
+
+Images generated after 40 000 mini batch evaluations:
+
+![](figs/GAN_1epoch.jpeg)
+
+While our training set does not have enough unique GT frontal images to train an unsupervised GAN with the likes of [NVIDIA's Style GAN](https://thenextweb.com/artificial-intelligence/2019/02/13/thispersondoesnotexist-com-is-face-generating-ai-at-its-creepiest), the GAN architecture turns out to be very good at generating the fine features, even though it introduces unwanted noise elsewhere. Evidently, these are the details that the discriminator uses to distinguish the *real* images from the *fake* ones, facilitating the generation of [photorealistic](https://arxiv.org/abs/1704.04086) and [super-resolved](https://medium.com/@jonathan_hui/gan-super-resolution-gan-srgan-b471da7270ec) synethic outputs.
+
+For your reference, below are the profile inputs and the ground truth frontals for the images generated above:
+
+![](figs/0_input.jpeg)
+
+![](figs/0_real.jpeg)
+
+![](figs/1_input.jpeg)
+
+![](figs/1_real.jpeg)
 
 
 *An extended version of this article was first published on the [Scaleway blog](https://blog.scaleway.com/2019/gpu-instances-using-deep-learning-to-obtain-frontal-rendering-of-facial-images/)*
