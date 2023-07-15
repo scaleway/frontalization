@@ -17,55 +17,114 @@ def weights_init(m):
 
 
 ''' Generator network for 128x128 RGB images '''
-class G(nn.Module):
+# class G(nn.Module):
     
+#     def __init__(self):
+#         super(G, self).__init__()
+        
+#         self.main = nn.Sequential(
+#             # Input HxW = 128x128
+#             nn.Conv2d(3, 16, 4, 2, 1), # Output HxW = 64x64
+#             nn.BatchNorm2d(16),
+#             nn.ReLU(True),
+#             nn.Conv2d(16, 32, 4, 2, 1), # Output HxW = 32x32
+#             nn.BatchNorm2d(32),
+#             nn.ReLU(True),
+#             nn.Conv2d(32, 64, 4, 2, 1), # Output HxW = 16x16
+#             nn.BatchNorm2d(64),
+#             nn.ReLU(True),
+#             nn.Conv2d(64, 128, 4, 2, 1), # Output HxW = 8x8
+#             nn.BatchNorm2d(128),
+#             nn.ReLU(True),
+#             nn.Conv2d(128, 256, 4, 2, 1), # Output HxW = 4x4
+#             nn.BatchNorm2d(256),
+#             nn.ReLU(True),
+#             nn.Conv2d(256, 512, 4, 2, 1), # Output HxW = 2x2
+#             nn.MaxPool2d((2,2)),
+#             # At this point, we arrive at our low D representation vector, which is 512 dimensional.
+
+#             nn.ConvTranspose2d(512, 256, 4, 1, 0, bias = False), # Output HxW = 4x4
+#             nn.BatchNorm2d(256),
+#             nn.ReLU(True),
+#             nn.ConvTranspose2d(256, 128, 4, 2, 1, bias = False), # Output HxW = 8x8
+#             nn.BatchNorm2d(128),
+#             nn.ReLU(True),
+#             nn.ConvTranspose2d(128, 64, 4, 2, 1, bias = False), # Output HxW = 16x16
+#             nn.BatchNorm2d(64),
+#             nn.ReLU(True),
+#             nn.ConvTranspose2d(64, 32, 4, 2, 1, bias = False), # Output HxW = 32x32
+#             nn.BatchNorm2d(32),
+#             nn.ReLU(True),
+#             nn.ConvTranspose2d(32, 16, 4, 2, 1, bias = False), # Output HxW = 64x64
+#             nn.BatchNorm2d(16),
+#             nn.ReLU(True),
+#             nn.ConvTranspose2d(16, 3, 4, 2, 1, bias = False), # Output HxW = 128x128
+#             nn.Tanh()
+#         )
+
+    
+#     def forward(self, input):
+#         output = self.main(input)
+#         return output
+
+class G(nn.Module):
     def __init__(self):
         super(G, self).__init__()
-        
-        self.main = nn.Sequential(
-            # Input HxW = 128x128
-            nn.Conv2d(3, 16, 4, 2, 1), # Output HxW = 64x64
-            nn.BatchNorm2d(16),
-            nn.ReLU(True),
-            nn.Conv2d(16, 32, 4, 2, 1), # Output HxW = 32x32
-            nn.BatchNorm2d(32),
-            nn.ReLU(True),
-            nn.Conv2d(32, 64, 4, 2, 1), # Output HxW = 16x16
-            nn.BatchNorm2d(64),
-            nn.ReLU(True),
-            nn.Conv2d(64, 128, 4, 2, 1), # Output HxW = 8x8
-            nn.BatchNorm2d(128),
-            nn.ReLU(True),
-            nn.Conv2d(128, 256, 4, 2, 1), # Output HxW = 4x4
-            nn.BatchNorm2d(256),
-            nn.ReLU(True),
-            nn.Conv2d(256, 512, 4, 2, 1), # Output HxW = 2x2
-            nn.MaxPool2d((2,2)),
-            # At this point, we arrive at our low D representation vector, which is 512 dimensional.
 
-            nn.ConvTranspose2d(512, 256, 4, 1, 0, bias = False), # Output HxW = 4x4
-            nn.BatchNorm2d(256),
-            nn.ReLU(True),
-            nn.ConvTranspose2d(256, 128, 4, 2, 1, bias = False), # Output HxW = 8x8
-            nn.BatchNorm2d(128),
-            nn.ReLU(True),
-            nn.ConvTranspose2d(128, 64, 4, 2, 1, bias = False), # Output HxW = 16x16
-            nn.BatchNorm2d(64),
-            nn.ReLU(True),
-            nn.ConvTranspose2d(64, 32, 4, 2, 1, bias = False), # Output HxW = 32x32
+        # Eyes branch
+        self.eyes = nn.Sequential(
+            # Add layers specific to generating eyes
+            nn.Conv2d(3, 32, 4, 2, 1),
             nn.BatchNorm2d(32),
             nn.ReLU(True),
-            nn.ConvTranspose2d(32, 16, 4, 2, 1, bias = False), # Output HxW = 64x64
-            nn.BatchNorm2d(16),
+            nn.Conv2d(32, 64, 4, 2, 1),
+            nn.BatchNorm2d(64),
             nn.ReLU(True),
-            nn.ConvTranspose2d(16, 3, 4, 2, 1, bias = False), # Output HxW = 128x128
+            nn.ConvTranspose2d(64, 32, 4, 2, 1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(32, 3, 4, 2, 1),
             nn.Tanh()
         )
 
-    
+        # Nose branch
+        self.nose = nn.Sequential(
+            # Add layers specific to generating nose
+            nn.Conv2d(3, 32, 4, 2, 1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(True),
+            nn.Conv2d(32, 64, 4, 2, 1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(64, 32, 4, 2, 1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(32, 3, 4, 2, 1),
+            nn.Tanh()
+        )
+
+        # Cheeks branch
+        self.cheeks = nn.Sequential(
+            # Add layers specific to generating cheeks
+            nn.Conv2d(3, 32, 4, 2, 1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(True),
+            nn.Conv2d(32, 64, 4, 2, 1),
+            nn.BatchNorm2d(64),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(64, 32, 4, 2, 1),
+            nn.BatchNorm2d(32),
+            nn.ReLU(True),
+            nn.ConvTranspose2d(32, 3, 4, 2, 1),
+            nn.Tanh()
+        )
+
     def forward(self, input):
-        output = self.main(input)
-        return output
+        eyes_output = self.eyes(input)
+        nose_output = self.nose(input)
+        cheeks_output = self.cheeks(input)
+
+        return eyes_output, nose_output, cheeks_output
 
 
 ''' Discriminator network for 128x128 RGB images '''
