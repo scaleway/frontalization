@@ -104,9 +104,19 @@ for epoch in range(30):
         optimizerD.step()
         
         # TRAINING THE GENERATOR
+        # netG.zero_grad()
+        # target = Variable(torch.ones(real.size()[0])).to(device)
+        # output = netD(generated)
+        # TRAINING THE GENERATOR
         netG.zero_grad()
         target = Variable(torch.ones(real.size()[0])).to(device)
+        generated = netG(profile)
+        generated_eyes, generated_nose, generated_cheeks = netG(profile)  # Extract the generated components
+
         output = netD(generated)
+
+
+
         
         # G wants to :
         # (a) have the synthetic images be accepted by D (= look like frontal images of people)
